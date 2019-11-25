@@ -4,6 +4,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.xx.loader.CollectActivity;
 import com.xx.loader.MainActivity;
 
 import java.io.File;
@@ -11,21 +12,17 @@ import java.io.RandomAccessFile;
 
 public class FilesUtil {
 
-    public void initData(String content, long curTime) {
+    public void initData(String content, long curTime, String state) {
         File sd = Environment.getExternalStorageDirectory();
-        String mPath = sd.getPath() + "/sensor_datas/";
-        Log.d("filePath",mPath);
+        String mPath = sd.getPath() + "/2sensor_datas/";
+        Log.d("filePath", mPath);
 
         if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             String mFile;
-            if (MainActivity.pattern){
-                mFile = curTime + "_3Dim" + ".txt";
-            }else {
-                mFile = curTime + "_Sum" + ".txt";
-            }
+            mFile = state + "_" + curTime + ".txt";
             writeTxtToFile(content, mPath, mFile);
         } else {
-            Log.e("error","file write error");
+            Log.e("error", "file write error");
         }
 
     }
@@ -34,8 +31,7 @@ public class FilesUtil {
     public void writeTxtToFile(String strContent, String filePath, String fileName) {
         //生成文件夹之后，再生成文件，不然会出错
         makeFilePath(filePath, fileName);
-
-        String strFilePath = filePath+fileName;
+        String strFilePath = filePath + fileName;
         try {
             File file = new File(strFilePath);
             if (!file.exists()) {
@@ -76,7 +72,7 @@ public class FilesUtil {
                 file.mkdir();
             }
         } catch (Exception e) {
-            Log.i("error:", e+"");
+            Log.i("error:", e + "");
         }
     }
 }

@@ -1,3 +1,35 @@
 <resources>
-    <string name="app_name">Loader</string>
+    <string name="app_name">状态识别</string>
+    <string-array name="states">
+        <item>背包</item>
+        <item>背包拉箱</item>
+        <item>兜里</item>
+        <item>兜里拉箱</item>
+        <item>拎包</item>
+        <item>拎包拉箱</item>
+        <item>手持</item>
+        <item>手持拉箱</item>
+    </string-array>
+
+    <string name="collect">采集数据</string>
+    <string name="classify">状态识别</string>
+    <string name="select">选择负重状态</string>
+
+
+    <string name="exit">最优疏散出口:</string>
+    <string name="load_status">当前负重状态:</string>
+    <string name="altitude">当前海拔高度:</string>
+    <string name="aim">站台层海拔高度:</string>
+    <string name="arrived">是否到达站厅层:</string>
+    <string name="move_type">移动方式:</string>
+    <string name="move_status">移动状态:</string>
+
+    <string name="move_info">请先行走至站厅层</string>
+    <string name="unknown">未知</string>
+    <string name="un_arrived">未到达</string>
+    <string name="step_ele">步梯</string>
+    <string name="stright_ele">直梯</string>
+    <string name="moving">正在移动</string>
+    <string name="un_move">未移动</string>
+
 </resources>

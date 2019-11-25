@@ -1,45 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
+    android:paddingTop="100dp"
+    android:layout_gravity="center_horizontal"
     android:orientation="vertical">
-    <TextView
+    <!--最优疏散出口-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/x_acc_text"/>
-    <TextView
+        android:layout_height="40dp">
+        <TextView
+            style="@style/text_main"
+            android:text="@string/exit" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_exit"
+            android:text="@string/move_info" />
+    </LinearLayout>
+    <!--当前负重状态-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/y_acc_text"/>
-    <TextView
+        android:layout_height="40dp">
+
+        <TextView
+            style="@style/text_main"
+            android:text="@string/load_status" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_status"
+            android:text="@string/load_status" />
+    </LinearLayout>
+
+    <!--当前海拔高度-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/z_acc_text"/>
-    <TextView
-        android:id="@+id/sum_acc"
+        android:layout_height="40dp">
+
+        <TextView
+            style="@style/text_main"
+            android:text="@string/altitude" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_altitude"
+            android:text="@string/altitude" />
+    </LinearLayout>
+
+    <!--站台层海拔高度-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-    <Button
-        android:id="@+id/pattern_change"
-        android:text="三维加速度"
+        android:layout_height="40dp">
+
+        <TextView
+            style="@style/text_main"
+            android:text="@string/aim" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_lowest"
+            android:text="@string/aim" />
+    </LinearLayout>
+
+    <!--是否到达站厅层-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="HardcodedText" />
-    <Button
-        android:id="@+id/start_collect"
-        android:text="开始采集"
+        android:layout_height="40dp">
+
+        <TextView
+            style="@style/text_main"
+            android:text="@string/arrived" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_arrived"
+            android:text="@string/un_arrived" />
+    </LinearLayout>
+    <!--移动方式-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="HardcodedText" />
-    <Button
-        android:id="@+id/stop_collect"
-        android:text="结束采集"
+        android:layout_height="40dp">
+
+        <TextView
+            style="@style/text_main"
+            android:text="@string/move_type" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_move_type"
+            android:text="@string/step_ele" />
+    </LinearLayout>
+    <!--移动状态-->
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:ignore="HardcodedText" />
+        android:layout_height="40dp"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/text_main"
+            android:text="@string/move_status" />
+
+        <TextView
+            style="@style/text_main"
+            android:id="@+id/tv_move_status"
+            android:text="@string/un_move" />
+    </LinearLayout>
 
 
 </LinearLayout>

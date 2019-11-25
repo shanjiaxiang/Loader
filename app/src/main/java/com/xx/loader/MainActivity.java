@@ -1,135 +1,177 @@
 package com.xx.loader;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.xx.loader.utils.FilesUtil;
-import com.xx.loader.utils.PermisionUtils;
+import java.text.DecimalFormat;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
-    private SensorManager mSensorManager;
-    private Sensor mSensor;
-    private TextView x_acc;
-    private TextView y_acc;
-    private TextView z_acc;
-    private TextView sum_acc;
-    private Button start_collect;
-    private Button stop_collect;
-    private Button change_collect_pattern;
-//    Ture 为三维 FALSE为合加速度
-    public static Boolean pattern = Boolean.TRUE;
-    Boolean is_writing = Boolean.FALSE;
-    long curTime;
+    private SensorManager mSensorManager = null;
+    private Sensor mPressureSensor = null;
+    private Sensor mAccSensor = null;
 
+    private TextView exit;
+    private TextView load_status;
+    private TextView altitude;
+    private TextView start_altitude;
+    private TextView arrived;
+    private TextView move_type;
+    private TextView move_status;
 
-    String filePath = "/sdcard/";
-    String fileName = "sensor_data.txt";
-    float a_x ;   // 获取x轴的加速度
-    float a_y ;   // 获取y轴的加速度
-    float a_z ;   // 获取z轴的加速度
-//    private final
+    private final SensorEventListener mPressureListener = new SensorEventListener() {
+        double lowest = 1000;
+        double hightest = -1000;
+
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_PRESSURE) {
+                DecimalFormat df = new DecimalFormat("0.00");
+                df.getRoundingMode();
+                Double pressure = Double.parseDouble(df.format(sensorEvent.values[0]));
+                // 海拔高度
+                double height = 44330000 * (1 - (Math.pow((pressure / 1013.25),
+                        (float) 1.0 / 5255.0)));
+                height = Double.parseDouble(df.format(height));
+                if (height < lowest) {
+                    lowest = height;
+                }
+                if (height > hightest) {
+                    hightest = height;
+                }
+                if (hightest - lowest < 4) {
+                    exit.setText("请先行走至站厅层...");
+                    load_status.setText("待识别");
+                    altitude.setText(height + "m");
+                    start_altitude.setText(lowest + "m");
+                    arrived.setText("未到达");
+
+                    move_status.setText("正在移动...");
+                } else {
+                    exit.setText("正在计算最优疏散闸机口...");
+                    load_status.setText("正在识别当前负重状态...");
+                    altitude.setText(height + "m");
+                    start_altitude.setText(lowest + "m");
+                    arrived.setText("已到达");
+                    move_status.setText("正在移动...");
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
+    private final SensorEventListener mAccListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                solveAcc(sensorEvent, 20);
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
+
+    private void solveAcc(SensorEvent sensorEvent, int size) {
+        DecimalFormat df = new DecimalFormat("0.00");
+        df.getRoundingMode();
+        float a_x = sensorEvent.values[0];   // 获取x轴的加速度
+        float a_y = sensorEvent.values[1];   // 获取y轴的加速度
+        float a_z = sensorEvent.values[2];   // 获取z轴的加速度
+        double sum_acc = Math.sqrt(a_x * a_x + a_y * a_y + a_z * a_z);
+        sum_acc = Double.parseDouble(df.format(sum_acc));
+
+        Queue<Double> queue = new LinkedList<>();
+        queue.add(sum_acc);
+        if (queue.size() > size) {
+            queue.poll();
+        }
+        double sum = 0;
+        for (double d : queue) {
+            sum += Math.pow(d - 9.8, 2);
+        }
+        sum = sum / size;
+        if (sum > 0.2){
+            move_type.setText("步梯");
+        }else {
+            move_type.setText("电梯");
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        PermisionUtils.verifyStoragePermissions(this);
+
+        //获取传感器服务管理器
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        mSensor = (Sensor) mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        mPressureSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+        mAccSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 
-        x_acc = (TextView)findViewById(R.id.x_acc_text);
-        y_acc = (TextView)findViewById(R.id.y_acc_text);
-        z_acc = (TextView)findViewById(R.id.z_acc_text);
-        sum_acc = (TextView)findViewById(R.id.sum_acc);
-        start_collect = (Button)findViewById(R.id.start_collect);
-        stop_collect = (Button)findViewById(R.id.stop_collect);
-        change_collect_pattern = (Button)findViewById(R.id.pattern_change);
+        exit = findViewById(R.id.tv_exit);
+        load_status = findViewById(R.id.tv_status);
+        altitude = findViewById(R.id.tv_altitude);
+        start_altitude = findViewById(R.id.tv_lowest);
+        arrived = findViewById(R.id.tv_arrived);
+        move_type = findViewById(R.id.tv_move_type);
+        move_status = findViewById(R.id.tv_move_status);
+    }
 
 
-        start_collect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (!is_writing){
-                    is_writing = !is_writing;
-                }
-                curTime = System.currentTimeMillis();
-                Toast.makeText(MainActivity.this, "start", Toast.LENGTH_SHORT).show();
-            }
-        });
-        stop_collect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (is_writing){
-                    is_writing = !is_writing;
-                }
-                Toast.makeText(MainActivity.this, "stop", Toast.LENGTH_SHORT).show();
-            }
-        });
-        change_collect_pattern.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                pattern = !pattern;
-                Toast.makeText(MainActivity.this, "pattern changed", Toast.LENGTH_SHORT).show();
-                if (pattern){
-                    change_collect_pattern.setText("三维加速度");
-                }else {
-                    change_collect_pattern.setText("合加速度");
-                }
-            }
-        });
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(sensorEventListener, mSensor, 20000);
-//                registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(mPressureListener, mPressureSensor,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(mAccListener, mAccSensor, SensorManager.SENSOR_DELAY_NORMAL);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(sensorEventListener);
+        mSensorManager.unregisterListener(mPressureListener, mPressureSensor);
+        mSensorManager.unregisterListener(mAccListener, mAccSensor);
     }
 
-    private SensorEventListener sensorEventListener = new SensorEventListener() {
-        @SuppressLint({"SetTextI18n", "ShowToast"})
-        @Override
-        public void onSensorChanged(SensorEvent sensorEvent) {
-            a_x = sensorEvent.values[0];   // 获取x轴的加速度
-            a_y = sensorEvent.values[1];   // 获取y轴的加速度
-            a_z = sensorEvent.values[2];   // 获取z轴的加速度
-            x_acc.setText("x轴加速度:" + a_x);
-            y_acc.setText("y轴加速度:" + a_y);
-            z_acc.setText("z轴加速度:" + a_z);
-            String sum_acc_temp = Math.sqrt(a_x*a_x + a_y*a_y + a_z*a_z ) + "";
-            sum_acc.setText("合加速度:" + sum_acc_temp);
-            String write2file;
-            if (is_writing){
-                if (!pattern){
-                    write2file = Math.sqrt(a_x*a_x + a_y*a_y + a_z*a_z ) + "\n";
-                }else {
-                    write2file = a_x + "\t" + a_y + "\t" + a_z + "\t" + "\n";
-                }
-                FilesUtil writer = new FilesUtil();
-                writer.initData(write2file, curTime);
-            }
-//            Toast.makeText(MainActivity.this, "onSensorChanged", Toast.LENGTH_SHORT).show();
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Intent it;
+        if (id == R.id.m_classify) {
+            it = new Intent(MainActivity.this, ClassifyActivity.class);
+            startActivity(it);
+            return true;
+        } else if (id == R.id.m_collect) {
+            it = new Intent(MainActivity.this, SelectActivity.class);
+            startActivity(it);
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
         }
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int i) {
-            Toast.makeText(MainActivity.this, "onAccuracyChanged", Toast.LENGTH_SHORT).show();
-        }
-    };
-
+    }
 }
