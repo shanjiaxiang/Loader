@@ -2,10 +2,6 @@ package com.xx.loader.utils;
 
 import android.os.Environment;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.xx.loader.CollectActivity;
-import com.xx.loader.MainActivity;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -75,4 +71,7 @@ public class FilesUtil {
             Log.i("error:", e + "");
         }
     }
+
+
+
 }
