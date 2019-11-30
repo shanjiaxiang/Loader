@@ -6,6 +6,7 @@ import android.util.Log;
 import com.xx.loader.utils.FileUtils;
 
 import java.io.File;
+
 public class App extends Application {
 
     @Override
@@ -15,10 +16,22 @@ public class App extends Application {
     }
 
     // 判断是否需要copy训练模型
-    private void copyFiles(){
+    private void copyFiles() {
+
+
         new Thread(new Runnable() {
             @Override
             public void run() {
+                for (String f : FileUtils.files) {
+                    String path = FileUtils.PATH + f + ".txt";
+                    File file = new File(path);
+                    if (!file.exists()) {
+                        Log.d("classify", "文件不存在, 开始拷贝....");
+                        FileUtils.copyFilesFassets(App.this, f + ".txt", path);
+                        Log.d("classify", "拷贝完成....");
+                    }
+                }
+
                 String path = FileUtils.PATH + "model.txt";
                 File file = new File(path);
                 if (!file.exists()) {

@@ -33,4 +33,13 @@
         android:layout_height="wrap_content"
         tools:ignore="HardcodedText" />
 
+    <Button
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/start_train"
+        android:text="开始训练"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:ignore="HardcodedText" />
+
 </LinearLayout>

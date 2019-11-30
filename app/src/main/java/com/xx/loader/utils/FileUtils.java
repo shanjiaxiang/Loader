@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 public class FileUtils {
-    static String[] files = {"背包", "背包拉箱", "兜里", "兜里拉箱", "拎包", "拎包拉箱", "手持", "手持拉箱"};
+    public static String[] files = {"背包", "背包拉箱", "兜里", "兜里拉箱", "拎包", "拎包拉箱", "手持", "手持拉箱"};
     static File sd = Environment.getExternalStorageDirectory();
     public static String PATH = sd.getPath() + "/2sensor_datas/";
 

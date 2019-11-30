@@ -13,7 +13,7 @@ import libsvm.svm_parameter;
 import libsvm.svm_print_interface;
 import libsvm.svm_problem;
 
-class svm_train {
+public class svm_train {
 	private svm_parameter param;		// set by parse_command_line
 	private svm_problem prob;		// set by read_problem
 	private svm_model model;

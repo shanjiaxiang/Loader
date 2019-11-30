@@ -13,8 +13,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.xx.loader.svm.svm_predict;
+import com.xx.loader.svm.svm_train;
 import com.xx.loader.utils.CalUtils;
 import com.xx.loader.utils.FileUtils;
+import com.xx.loader.utils.GenVectors;
 
 import java.io.IOException;
 
@@ -33,6 +35,7 @@ public class ClassifyActivity extends AppCompatActivity {
     private TextView z_acc;
     private TextView sum_acc;
     private Button start_classify;
+    private Button start_train;
 
     long curTime;
     float a_x;   // 获取x轴的加速度
@@ -55,6 +58,7 @@ public class ClassifyActivity extends AppCompatActivity {
         z_acc = findViewById(R.id.z_acc_text);
         sum_acc = findViewById(R.id.sum_acc);
         start_classify = findViewById(R.id.start_classify);
+        start_train = findViewById(R.id.start_train);
         start_classify.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -67,6 +71,16 @@ public class ClassifyActivity extends AppCompatActivity {
                         classfying = !classfying;
                     }
                 },3000);
+            }
+        });
+
+        start_train.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                start_train.setText("正在训练");
+                Toast.makeText(ClassifyActivity.this, "训练开始", Toast.LENGTH_SHORT).show();
+                start_train.setClickable(false);
+                training();
             }
         });
     }
@@ -159,5 +173,40 @@ public class ClassifyActivity extends AppCompatActivity {
 
             }
         }).start();
+    }
+
+
+    private void training(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                GenVectors.getTrainVectors(FileUtils.files, 70, 140, "train");
+//                GenVectors.getTrainVectors(FileUtils.files, 70, 30, "test");
+                String[] arg = {FileUtils.PATH + "train.txt", FileUtils.PATH + "model.txt"};
+//                String[] parg = {FileUtils.PATH + "test.txt", FileUtils.PATH + "model.txt", FileUtils.PATH + "out.txt"};
+                Log.d("classify", "开始训练");
+                long start = System.currentTimeMillis();
+                svm_train t = new svm_train();
+                long end = System.currentTimeMillis();
+                Log.d("classify", "训练结束，用时"+(end-start)/1000+"s");
+//                svm_predict p = new svm_predict();
+                try {
+                    svm_train.main(arg);
+//                    p.main(parg);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("classify", "训练结束");
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        start_train.setText("训练结束");
+                        start_train.setClickable(true);
+                        Toast.makeText(ClassifyActivity.this, "训练结束", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        }).start();
+
     }
 }
