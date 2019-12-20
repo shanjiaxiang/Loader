@@ -11,10 +11,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <!--识别页面-->
         <activity android:name=".ClassifyActivity"></activity>
+        <!--数据采集页面-->
         <activity android:name=".CollectActivity" />
+        <!--选择采集动作-->
         <activity android:name=".SelectActivity" />
+        <!--暂未使用-->
         <activity android:name=".DirectionActivity" />
+        <!--主页面-->
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

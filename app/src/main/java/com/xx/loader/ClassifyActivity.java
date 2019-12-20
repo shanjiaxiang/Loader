@@ -132,6 +132,9 @@ public class ClassifyActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * 启动一个新的线程识别采集到的数据
+     */
     private void classfy() {
         new Thread(new Runnable() {
             @Override
